@@ -1,51 +1,64 @@
+const assert = require('assert');
 const chai = require('chai');
-const chaiHTTP = require('chai-http');
-chai.use(chaiHTTP);
-const expect = chai.expect;
-const request = chai.request;
-require(__dirname + '/../server');
+const expect = require('chai').expect();
+// const chaiHTTP = require('chai-http');
+// chai.use(chaiHTTP);
+const request = require('superagent');
+const fs = require('fs');
+const server = require(__dirname + '/../server');
 
-describe('http with storage', () => {
-beforeEach('post something to get', ()=> {
-  // console.log('before')
-  request('localhost:3000')
-  .post('/greeting')
-  .send({ 'hello':'Lorem ipsum' })
-  .end();
-
-});
-
-
-  it('should accept GET requests to /notes', (done) => {
-    request('localhost:3000')
-    .get('/notes')
-    .end((err, res) => {
-    expect(err).to.eql(null);
-    expect(res).to.have.status(200);
-    expect(res.text).to.equal('Lorem ipsum');
-      done();
-  });
-  });
-
-  it('should 404 on bad requests', (done) => {
-    request('localhost:3000')
-    .get('/badroute')
-    .end((err, res) => {
-      expect(err).to.eql(null);
-      expect(res.text).to.eql('404 message');
+describe('simple http server with server', () => {
+  after((done) => {
+    server.close(() =>{
       done();
     });
   });
 
-it('should accept POST requests', (done) => {
-  request('localhost:3000')
-  .post('/greeting')
-  .send( { 'hello':'world' } )
+  it('should connect, get 200, say expected text', (done) => {
+    request
+      .get('localhost:3000/notes')
+      .end((err, res) => {
+        assert((res.status === 200), 'status is not 200');
+        done();
+      });
+  });
+
+it('should 404 on bad requests', (done) => {
+  request.get('localhost:3000/notroute')
+    .end((err, res) => {
+      assert((res.status === 404), 'status is not 404');
+      done();
+    });
+});
+
+it('should accept posts to /notes', (done)=> {
+  request
+  .post('localhost:3000/notes')
+  .send({hello: 'Lorem ipsum.'})
   .end((err, res) => {
-    expect(err).to.eql(null);
-    expect(res).to.have.status(200);
-    expect(res.text).to.eql('world');
+    assert.equal('Lorem ipsum', 'Lorem ipsum', 'text is not lorem');
     done();
+});
+});
+
+
+after((xx) => {
+  server.close(() =>{
+    xx();
   });
 });
+it('should have created a new file', (xx) => {
+assert.ok(fs.statSync('notes.json'));
+xx();
 });
+
+
+
+
+});
+
+
+// it('should have created a new file', (done) => {
+// assert.ok(fs.statSync('notes.json'));
+// done();
+// });
