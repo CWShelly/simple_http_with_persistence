@@ -24,6 +24,7 @@ describe('simple http server with server', () => {
   });
 
 it('should 404 on bad requests', (done) => {
+  process.nextTick();
   request.get('localhost:3000/notroute')
     .end((err, res) => {
       assert((res.status === 404), 'status is not 404');
@@ -43,17 +44,14 @@ it('should accept posts to /notes', (done)=> {
 
 
 after((xx) => {
-  server.close(() =>{
-    xx();
-  });
+console.log('things');
+xx();
 });
+
 it('should have created a new file', (xx) => {
 assert.ok(fs.statSync('notes.json'));
 xx();
 });
-
-
-
 
 });
 
