@@ -14,6 +14,17 @@ describe('simple http server with server', () => {
     });
   });
 
+  it('should accept posts to /notes + have created a json file', (done)=> {
+    request
+    .post('localhost:3000/notes')
+    .send({hello: 'Lorem ipsum.'})
+    .end((err, res) => {
+      assert.equal('Lorem ipsum', 'Lorem ipsum', 'text is not lorem');
+      assert.ok(fs.statSync('notes.json'));
+      done();
+  });
+  });
+
   it('should connect, get 200, say expected text', (done) => {
     request
       .get('localhost:3000/notes')
@@ -23,8 +34,8 @@ describe('simple http server with server', () => {
       });
   });
 
+
 it('should 404 on bad requests', (done) => {
-  process.nextTick();
   request.get('localhost:3000/notroute')
     .end((err, res) => {
       assert((res.status === 404), 'status is not 404');
@@ -32,31 +43,4 @@ it('should 404 on bad requests', (done) => {
     });
 });
 
-it('should accept posts to /notes', (done)=> {
-  request
-  .post('localhost:3000/notes')
-  .send({hello: 'Lorem ipsum.'})
-  .end((err, res) => {
-    assert.equal('Lorem ipsum', 'Lorem ipsum', 'text is not lorem');
-    done();
 });
-});
-
-
-after((xx) => {
-console.log('things');
-xx();
-});
-
-it('should have created a new file', (xx) => {
-assert.ok(fs.statSync('notes.json'));
-xx();
-});
-
-});
-
-
-// it('should have created a new file', (done) => {
-// assert.ok(fs.statSync('notes.json'));
-// done();
-// });
